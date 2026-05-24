@@ -1,7 +1,7 @@
 const CACHE_NAME = 'tempo-sp-v3';
 const API_CACHE_NAME = 'tempo-sp-api-v1';
 const API_MAX_ENTRIES = 3;
-const ASSETS = ['./', './index.html', './styles.css', './app.js', './manifest.webmanifest', './icons/icon.svg'];
+const ASSETS = ['./', './index.html', './styles.css', './app.js', './manifest.webmanifest', './icons/icon.svg', './icons/icon-192.png', './icons/icon-512.png'];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS)));
