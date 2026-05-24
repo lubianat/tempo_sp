@@ -53,8 +53,24 @@ export function buildApiTarget(now = new Date()) {
   };
 }
 
-export async function loadMeteogram(now = new Date()) {
-  const target = buildApiTarget(now);
+export function buildPreviousTarget(target) {
+  if (target.cycle === '12') {
+    return {
+      date: target.date,
+      cycle: '00',
+      url: `${API_BASE}/${target.date}/00`,
+    };
+  }
+
+  const previousDate = shiftDate(target.date, -1);
+  return {
+    date: previousDate,
+    cycle: '12',
+    url: `${API_BASE}/${previousDate}/12`,
+  };
+}
+
+async function loadMeteogramForTarget(target) {
   const response = await fetch(target.url);
   if (!response.ok) {
     throw new Error(`Falha na API (${response.status}).`);
@@ -72,19 +88,67 @@ export async function loadMeteogram(now = new Date()) {
   };
 }
 
+export async function loadMeteogram(now = new Date()) {
+  const target = buildApiTarget(now);
+  return loadMeteogramForTarget(target);
+}
+
 async function main() {
   const img = document.querySelector('#meteograma');
   const status = document.querySelector('#status');
+  const latestTarget = buildApiTarget();
+  const previousTarget = buildPreviousTarget(latestTarget);
+  let showingPrevious = false;
+  let loading = false;
+  let touchStartX = null;
+  let touchStartY = null;
 
-  try {
-    const { target, imageSrc, fromCache } = await loadMeteogram();
-    img.src = imageSrc;
-    if (fromCache) {
-      status.textContent = 'Offline – exibindo último meteograma salvo';
+  const showTarget = async (target) => {
+    if (loading) return;
+    loading = true;
+    try {
+      const { imageSrc, fromCache } = await loadMeteogramForTarget(target);
+      img.src = imageSrc;
+      status.textContent = fromCache ? 'Offline – exibindo último meteograma salvo' : '';
+      showingPrevious = target.date === previousTarget.date && target.cycle === previousTarget.cycle;
+    } catch (error) {
+      status.textContent = error instanceof Error ? error.message : 'Erro inesperado.';
+    } finally {
+      loading = false;
     }
-  } catch (error) {
-    status.textContent = error instanceof Error ? error.message : 'Erro inesperado.';
-  }
+  };
+
+  await showTarget(latestTarget);
+
+  img.addEventListener(
+    'touchstart',
+    (event) => {
+      if (event.touches.length !== 1) return;
+      const touch = event.touches[0];
+      touchStartX = touch.clientX;
+      touchStartY = touch.clientY;
+    },
+    { passive: true }
+  );
+
+  img.addEventListener(
+    'touchend',
+    async (event) => {
+      if (touchStartX === null || touchStartY === null || event.changedTouches.length !== 1) return;
+
+      const touch = event.changedTouches[0];
+      const deltaX = touch.clientX - touchStartX;
+      const deltaY = touch.clientY - touchStartY;
+      touchStartX = null;
+      touchStartY = null;
+
+      if (Math.abs(deltaX) < 40 || Math.abs(deltaX) <= Math.abs(deltaY)) return;
+
+      const nextTarget = showingPrevious ? latestTarget : previousTarget;
+      await showTarget(nextTarget);
+    },
+    { passive: true }
+  );
 
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('service-worker.js').catch(() => {});

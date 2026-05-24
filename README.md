@@ -6,3 +6,5 @@ Regra de seleção de endpoint (horário de São Paulo):
 - 13:00 ou mais: `YYYY-MM-DD/12`
 - 01:00 até 12:59: `YYYY-MM-DD/00`
 - 00:00 até 00:59: dia anterior em `12`
+
+No mobile, o gesto de swipe horizontal alterna apenas entre o meteograma mais recente e o imediatamente anterior (n-1).
