@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Meteograma São Paulo</title>
+    <meta
+      name="description"
+      content="Meteograma mais recente do INMET para São Paulo."
+    />
+    <meta name="theme-color" content="#0f172a" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="icon" href="/icons/icon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main>
+      <h1>Meteograma — São Paulo</h1>
+      <p id="status" aria-live="polite">Carregando...</p>
+      <img id="meteograma" alt="Meteograma do INMET para São Paulo" />
+    </main>
+    <footer>
+      Dados do <a href="https://meteograma.inmet.gov.br/">INMET</a>.
+    </footer>
+    <script type="module" src="/app.js"></script>
+  </body>
+</html>
