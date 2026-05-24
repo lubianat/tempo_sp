@@ -79,9 +79,9 @@ async function main() {
   try {
     const { target, imageSrc, fromCache } = await loadMeteogram();
     img.src = imageSrc;
-    status.textContent = fromCache
-      ? 'Offline – exibindo último meteograma salvo'
-      : `Endpoint: ${target.date}/${target.cycle}`;
+    if (fromCache) {
+      status.textContent = 'Offline – exibindo último meteograma salvo';
+    }
   } catch (error) {
     status.textContent = error instanceof Error ? error.message : 'Erro inesperado.';
   }
