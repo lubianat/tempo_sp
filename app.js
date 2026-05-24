@@ -78,7 +78,6 @@ async function main() {
   try {
     const { target, imageSrc } = await loadMeteogram();
     img.src = imageSrc;
-    status.textContent = `Endpoint: ${target.date}/${target.cycle}`;
   } catch (error) {
     status.textContent = error instanceof Error ? error.message : 'Erro inesperado.';
   }
