@@ -71,7 +71,7 @@ export function buildPreviousTarget(target) {
 }
 
 async function loadMeteogramForTarget(target) {
-  const response = await fetch(target.url, { cache: 'no-store' });
+  const response = await fetch(target.url);
   if (!response.ok) {
     throw new Error(`Falha na API (${response.status}).`);
   }
@@ -84,6 +84,7 @@ async function loadMeteogramForTarget(target) {
   return {
     target,
     imageSrc: payload.base64,
+    fromCache: response.headers.get('X-Served-From-Cache') === 'true',
   };
 }
 
@@ -106,9 +107,9 @@ async function main() {
     if (loading) return;
     loading = true;
     try {
-      const { imageSrc } = await loadMeteogramForTarget(target);
+      const { imageSrc, fromCache } = await loadMeteogramForTarget(target);
       img.src = imageSrc;
-      status.textContent = '';
+      status.textContent = fromCache ? 'Offline – exibindo último meteograma salvo' : '';
       showingPrevious = target.date === previousTarget.date && target.cycle === previousTarget.cycle;
     } catch (error) {
       status.textContent = error instanceof Error ? error.message : 'Erro inesperado.';
